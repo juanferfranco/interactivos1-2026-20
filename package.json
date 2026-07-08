@@ -1,0 +1,23 @@
+{
+  "name": "",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.41.3",
+    "@babel/runtime": "^7.26.10",
+    "astro": "^7.0.6",
+    "esbuild": ">=0.25.0",
+    "rehype-mathjax": "^6.0.0",
+    "remark-math": "^6.0.0"
+  },
+  "devDependencies": {
+    "esbuild": ">=0.25.0"
+  }
+}
