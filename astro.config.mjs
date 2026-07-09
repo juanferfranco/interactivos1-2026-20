@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import { unified } from '@astrojs/markdown-remark';
 import starlight from '@astrojs/starlight';
 import remarkMath from 'remark-math';
 import rehypeMathjax from 'rehype-mathjax';
@@ -12,8 +13,10 @@ export default defineConfig({
 			type: 'shiki',
 			excludeLangs: ['math'],
 		},
-		remarkPlugins: [remarkMath],
-		rehypePlugins: [rehypeMathjax],
+		processor: unified({
+			remarkPlugins: [remarkMath],
+			rehypePlugins: [rehypeMathjax],
+		}),
 	},
 	integrations: [
 		starlight({

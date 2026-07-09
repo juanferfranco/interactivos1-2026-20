@@ -4,6 +4,7 @@ unitId: unit1
 ---
 
 import { Aside } from '@astrojs/starlight/components';
+import { LinkPreview, YouTube } from 'astro-embed';
 
 ## Título
 
@@ -40,4 +41,201 @@ decisiones sonoras, los errores encontrados y las evidencias del resultado.
 
 ## Actividades
 
-Esta sección se irá completando clase a clase.
+### Actividad 01
+
+En esta actividad te voy a mostrar algunos ejemplos de sistemas físicos interactivos en tiempo real:
+
+<LinkPreview id="https://momentfactory.com/collections/all" />
+
+<LinkPreview id="https://www.youtube.com/@MomentFactory/videos" />
+
+
+<LinkPreview id="https://tdaxis.github.io/index.html" title="Proyecto IDED: TDAxis" />
+
+<YouTube id="https://youtu.be/cML814JD09g?si=FnrXVIiNgTk9YMhy" title="Location based VR: The VOID" />
+
+<LinkPreview id="https://sandboxvr.com/" title="Location based VR: Sandbox VR" />
+
+<YouTube id="https://youtu.be/NKE39Tg9oQY" title="Mario Kart" />
+
+<YouTube id="https://youtu.be/h5WzF1ch3ww" title="Haptic VR Gloves" />
+
+<YouTube id="https://youtu.be/WkOKERfxlpU" title="iPad drawing into StreamDiffusion" />
+
+<YouTube id="https://youtu.be/XkXrLZmnQ_M" title="Real Time Tracking & Projection Mapping (Full ver.)" />
+
+<LinkPreview id="https://www.excurio.com/en/" title="Excurio: immersive expedition" />
+
+<LinkPreview id="https://drive.google.com/file/d/1sU6hnB91KABfIkzb8BxrmD-1jl8pwhHu/view?usp=sharing" title="Lugares de memoria" />
+
+<YouTube id="https://youtu.be/okB18ZhJNCw?si=l_sfnt8pX6KgBlo8" title="Captura: pasajes de memoria" />
+
+<LinkPreview id="https://www.youtube.com/@daydreamliveai/videos" title="Daydream AI" />
+
+<LinkPreview id="https://app.daydream.live/creators/juanelfranco/becoming" title="Becoming" />
+
+<YouTube id="https://youtu.be/oxPaZFRve9w?si=ZdLBM7EL9fUZL8YN" title="Becoming demo" />
+
+<LinkPreview id="https://drive.google.com/file/d/1DotmXIoW5441XgMl0X89DvlF_6u9MlLB/view?usp=sharing" title="Proyección Full dome para planetario" />
+
+<LinkPreview id="https://docs.google.com/document/d/1a1sSw8ch140p8nj_5b-XwQf-6RM9Sin5VT3HdJ7RRRk/edit?usp=sharing" title="Ficha de Hermes" />
+
+<LinkPreview id="https://drive.google.com/file/d/1TKHGofMBoQpKAdzKT7uCmK1Q6615Qm-C/view?usp=sharing" title="Hermes" />
+
+
+### Actividad 02
+
+Vamos al [tablero](https://excalidraw.com/) y conversemos sobre el sistema físico interactivo en 
+tiempo real que vamos a construir durante el curso inspirado en este trabajo:
+
+<YouTube id="https://youtu.be/B6uHfTcI2f4?si=IadnzTETHGaa7lGs" />
+
+<LinkPreview id="https://derivative.ca/community-post/euphoric-beats-interactive-feats-inside-plexusplay/74647" />
+
+
+### Actividad 03
+
+En esta unidad vamos a realizar experimentos con audio en Strudel. Te voy a mostrar algunos ejemplos:
+
+```javascript
+setcpm(35) // 140 beat
+
+// ==========================================
+// MEZCLADORA INDEPENDIENTE
+// ==========================================
+const BASS_ON    = 0
+const PIANO_ON   = 0
+const CEL = 0
+const VAR3 = 0
+const VAR1  = 0
+const VAR2 = 0
+
+// Bass: Sigue las tónicas de la progresión (Fmaj7 - G6 - Em7 - Am9)
+bass: note("{<f1 g1 e1 a1>}")
+  .sound("supersaw")
+  .lpf(slider(1187.4,300,2000)) 
+  .room(1)
+  .postgain(BASS_ON ? 0.3 : 0)
+
+piano : note("{<[f3,a3,c4,e4] [g3,b3,d4,e4] [e3,g3,b3,d4] [a3,c4,e4,b4]>}")  
+  .sound("piano")
+  .attack(slider(0.192,0,1)) 
+  .lpf(slider(1490,300,2000))
+  .room(1.2) 
+  .postgain(PIANO_ON ? 0.5 : 0)
+
+// ==========================================
+// CÉLULAS Y VARIACIONES MELÓDICAS
+// ==========================================
+const celula = "<[c5 e5] [b4 g5] [a4 d5] [b4 e5 c5]>"
+const var1   = "< [[c5 e5] [b4 g5]] [[c5 e5] [b4 g5]] [[a4 d5] [b4 e5 c5]] [[a4 d5] [b4 e5 c5]]>"
+const var2   = celula.transpose(12)
+const var3   = "{<[e5 c5] [f5 a4] [g5 d5] [f5 c5 e5]>}"
+
+// ==========================================
+// CANALES DE MELODÍA INDEPENDIENTES
+// ==========================================
+
+// Célula
+$celula: note(celula)
+  .sound("sine") 
+  .decay(0.4)
+  .sustain(0.2)
+  .room(1.5) 
+  .postgain(CEL ? 0.6 : 0)
+
+// Disminución rítmica
+$var1: note(var1)
+  .sound("sine") 
+  .decay(0.4)
+  .sustain(0.2)
+  .room(1.5) 
+  .postgain(VAR1 ? 0.5 : 0)
+
+// Transpuesta (Octava Alta)
+$var2: note(var2)
+  .sound("triangle") // sine, triangle
+  .decay(0.4)
+  .sustain(0.2)
+  .room(1.5) 
+  .postgain(VAR2 ? 0.2 : 0) 
+
+// Inversión
+$var3: note(var3)
+  .sound("sine") 
+  .attack(slider(0.359,0,1))
+  .lpf(slider(993.6,300,2000))
+  .postgain(VAR3 ? 0.3 : 0)
+```
+
+```javascript
+$: s("triangle*4").decay(0.5).n(irand(12)).scale('C6:minor')
+.room(1).roomsize(10).gain(0.1)
+
+$: s("triangle*4").decay(0.5).n(irand(12)).scale('C4:minor')
+.room(1).roomsize(10).gain(slider(0.5,0.1,1,0.1))
+
+$: s("triangle*4").decay(0.5).n(irand(6)).scale('C3:minor')
+.room(1).roomsize(10).gain(1.5).lpf(100).lpa('.5').lpenv("<4 2 1 0 -1 -2 -4>/4")
+
+$:s("supersaw").seg("<4 16 8 16>").lpf(tri.range(100, 5000).slow(2)).gain(slider(0.6,0,1,0.1))
+
+
+let drum = stack(
+  s("bd")
+    .beat("0,7,10?,15",16)
+    .gain("<1 .95 1 .9>")
+    .duck("3:4:5"),
+
+  s("bd")
+    .beat("14?",16)
+    .gain(.35)
+    .late(.006),
+  s("hh")
+    .beat("0,1,4,6,8,10,12,14",16)
+    .gain("[.45 .25 .58 .32 .50 .28 .65 .35]")
+    .late("[0 .008 0 .012 0 .006 0 .01]"),
+
+  // Hi-hats fantasma entre golpes
+  s("hh:1")
+    .beat("3?,5?,9?,11?,13?",16)
+    .gain(.18)
+    .late(.01),
+
+  // Open hat más conversacional
+  s("oh:1")
+    .beat("2,10?",16)
+    .gain("<.55 .35 .5 .3>")
+    .clip(.35),
+
+  // Clap estable
+  s("cp")
+    .beat("4,12",16)
+    .gain("<.75 .7 .82 .72>"),
+
+  // Clap fantasma antes de la caja
+  s("cp")
+    .beat("3?,11?",16)
+    .gain(.16)
+    .late(.012)
+)
+.bank("RolandTr909")
+.color("red")
+._scope()
+$drum: drum
+
+
+let hhLine = sound("hh*16").gain(sine)
+
+$: stack(
+  hhLine,
+)
+```
+
+### Actividad 04
+
+En esta esta actividad vas a comenzar a explorar algunas ideas de creación sonora. Vamos a revisar juntos, pero 
+la invitación es a que juegues y experimentes. 
+
+
+
