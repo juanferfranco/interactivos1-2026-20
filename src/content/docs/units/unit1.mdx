@@ -234,8 +234,51 @@ $: stack(
 
 ### Actividad 04
 
-En esta esta actividad vas a comenzar a explorar algunas ideas de creación sonora. Vamos a revisar juntos, pero 
-la invitación es a que juegues y experimentes. 
+En esta esta actividad vas a comenzar a explorar algunas ideas de creación sonora. Vamos a revisar algunas cuestiones 
+juntos, pero realmente la invitación es a que juegues y experimentes. 
+
+Ingresemos a este sitio web:
+
+<LinkPreview 
+id="https://learningmusic.ableton.com/" 
+title="Get started making music" 
+/>
+
+Vamos a reproducir los mismos beats usando esta base:
+
+```javascript
+setcpm(24.5)
+
+let drum = stack(
+  s("oh:1").beat("3,5,9,13",16),
+  s("hh").beat("0,1,4,6,8,10,12,14",16),
+  s("cp").beat("4,12",16),
+  s("bd").beat("0,2,3,7,9,10,15",16),
+).bank("RolandTr909");
+
+
+$drum: drum
+```
+
+Luego puedes ir agregando capas mediante notas, acordes, variaciones y efectos. Te 
+dejo algunos snippets de ejemplo para que los uses como referencia:
+
+```javascript
+setcpm(20)
+let melody = note("[c4 c4 e4 g4  e4 e4 ~ d4 c4 a3 a3 a3 ~ d4 d4 c4]").sound("piano").legato(1);
+$melody: melody
+```
+
+```javascript
+setcpm(20)
+let harmony = chord("F ~ ~ ~ ~ G ~ ~ ~ Em ~ ~ ~ ~ Am ~").voicing().s("gm_epiano1");
+let harmony2 = chord("F@4 G@4 Em@4 Am@4")
+  .voicing()
+  .s("gm_epiano1");
+
+$harmony:harmony2
+```
+
 
 
 
