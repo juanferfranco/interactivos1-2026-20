@@ -263,18 +263,21 @@ $drum: drum
 Luego puedes ir agregando capas mediante notas, acordes, variaciones y efectos. Te 
 dejo algunos snippets de ejemplo para que los uses como referencia:
 
+Melodía:
+
 ```javascript
 setcpm(20)
 let melody = note("[c4 c4 e4 g4  e4 e4 ~ d4 c4 a3 a3 a3 ~ d4 d4 c4]").sound("piano").legato(1);
 $melody: melody
 ```
 
+Acordes:
+
 ```javascript
 setcpm(20)
 let harmony = chord("F ~ ~ ~ ~ G ~ ~ ~ Em ~ ~ ~ ~ Am ~").voicing().s("gm_epiano1");
-let harmony2 = chord("F@4 G@4 Em@4 Am@4")
-  .voicing()
-  .s("gm_epiano1");
+let harmony2 = chord("F@4 G@4 Em@4 Am@4").voicing().s("gm_epiano1");
+let harmony3 = note("<[f3,a3,c4,e4] [g3,b3,d4,e4] [e3,g3,b3,d4] [a3,c4,e4,b4]>").sound("piano").attack(slider(0.233,0,1)).lpf(slider(1483.2,300,2000)).room(2)
 
 $harmony:harmony2
 ```
