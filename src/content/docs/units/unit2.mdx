@@ -1,14 +1,10 @@
 ---
-title: Unidad 2 - Visuales con p5.js
+title: Unidad 2 - Visuales generativas y parametrizables
 unitId: unit2
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 import { LinkPreview, YouTube } from 'astro-embed';
-
-## Título
-
-Visuales generativas y parametrizables
 
 ## Momento del curso
 
@@ -216,8 +212,173 @@ lo que haremos ahora.
 
 ### Actividad 03
 
+#### Construcción guiada: un sistema visual generativo desde cero
 
+En esta actividad construiremos juntos, desde un proyecto vacío de
+TouchDesigner, un sistema visual generativo sencillo. El objetivo no es copiar
+una imagen terminada ni aprender muchos operadores, sino observar cómo una
+intención se convierte en entidades, relaciones, reglas, variaciones y
+parámetros dentro de una red.
 
+La intención común será producir un campo visual que pueda desplazarse entre
+dos comportamientos: **calma y continuidad** frente a **intensidad y
+fragmentación**, sin perder su identidad visual. Para lograrlo construiremos una
+red basada principalmente en TOPs:
 
+1. Crearemos un campo procedural con `Noise TOP`.
+2. Transformaremos sus valores para definir masas, bordes y contraste.
+3. Usaremos un segundo campo para deformar el primero con `Displace TOP`.
+4. Traduciremos los valores del campo a una paleta mediante `Ramp TOP` y
+   `Lookup TOP`.
+5. Compondremos el resultado y lo enviaremos a un `Null TOP` de salida.
+6. Agruparemos la red en un componente y expondremos sus controles principales
+   como parámetros personalizados.
 
+Mientras construimos la red relacionaremos cada decisión técnica con las
+operaciones de la mentalidad generativa:
 
+| Operación | Cómo aparecerá en el sistema |
+|---|---|
+| Intención | El tránsito entre calma/continuidad e intensidad/fragmentación. |
+| Entidades | Campos de valores, masas visuales, bordes y color. |
+| Relaciones | Un campo deforma a otro y sus valores determinan la paleta. |
+| Entradas | Controles manuales que más adelante podrán recibir eventos externos. |
+| Reglas | Generación, transformación, deformación, mapeo de color y composición. |
+| Invariantes | La paleta, la composición general y el lenguaje de movimiento. |
+| Variabilidad | El ruido, la evolución temporal y las combinaciones de parámetros. |
+| Curaduría | Comparar resultados, ajustar límites y conservar solo variaciones coherentes con la intención. |
+
+#### Parámetros que vamos a exponer
+
+El sistema debe poder controlarse sin entrar a modificar su red interna. Como
+mínimo expondremos los siguientes parámetros:
+
+| Parámetro | Tipo | Efecto esperado |
+|---|---|---|
+| `speed` | Continuo | Velocidad de evolución del campo. |
+| `scale` | Continuo | Escala espacial de las formas. |
+| `deformation` | Continuo | Intensidad con la que un campo deforma al otro. |
+| `colorShift` | Continuo | Desplazamiento dentro de la paleta. |
+| `pulse` | Evento | Cambio breve de luminosidad, escala o contraste. |
+| `freeze` | Evento | Regreso al campo inicial y mantenimiento de ese estado mientras está activo. |
+
+<Aside type="tip" title="Preparación para la Unidad 3">
+En esta actividad los parámetros se controlarán manualmente. Los nombres, rangos
+y comportamientos deben quedar claros porque, en la próxima unidad, algunos de
+ellos dejarán de recibir valores manuales y responderán a eventos provenientes
+de Strudel.
+</Aside>
+
+Al finalizar realizaremos tres pruebas:
+
+- Llevar cada parámetro a sus valores mínimo y máximo para observar sus límites.
+- Construir y guardar tres estados visuales diferentes producidos por la misma
+  red.
+- Activar repetidamente `pulse` y `freeze` para comprobar que los eventos
+  discretos producen respuestas visibles y predecibles.
+
+En la bitácora registrarás una captura de la red, una tabla breve que explique
+qué controla cada parámetro y una reflexión sobre la relación entre la
+intención visual y las reglas construidas.
+
+<Aside type="caution" title="Qué significa freeze en esta actividad">
+`freeze` no reinicia un reloj interno. Al activarlo, lleva los campos a sus
+coordenadas iniciales y los mantiene allí mientras está activo. El reinicio
+temporal verdadero —volver al inicio y continuar evolucionando desde allí— se
+trabajará más adelante, cuando estudiemos eventos y sincronización.
+</Aside>
+
+### Actividad 04
+
+#### Reto de diseño: sistema visual generativo parametrizable
+
+Ahora diseñarás y construirás tu propio sistema visual generativo en
+TouchDesigner. Puedes usar la arquitectura de la actividad anterior como punto
+de partida, pero debes transformar su intención, sus reglas, su materialidad o
+sus relaciones para producir una propuesta propia. El reto no consiste en
+agregar operadores por cantidad: consiste en diseñar un sistema legible,
+coherente y controlable.
+
+Antes de construir, define en tu bitácora:
+
+1. Una intención visual o experiencial expresada en una frase.
+2. Las entidades que existirán en el sistema.
+3. Las relaciones y reglas que producirán el comportamiento.
+4. Los invariantes que conservarán su identidad.
+5. Aquello que podrá variar en cada ejecución.
+
+#### Condiciones del reto
+
+Tu sistema debe:
+
+- Generar una **familia de resultados** y no una única composición fija.
+- Hacer visible una relación clara entre la intención declarada y las reglas
+  implementadas.
+- Exponer por lo menos **cuatro parámetros significativos** en la interfaz del
+  componente, sin necesidad de editar su red interna.
+- Incluir al menos **dos parámetros continuos** y **un parámetro de evento**
+  como `pulse`, `trigger`, `changeState` o `freeze`.
+- Asignar a cada parámetro un nombre comprensible, un rango útil y un efecto
+  visual observable.
+- Mantener un comportamiento estable en tiempo real y evitar combinaciones de
+  valores que rompan la salida visual.
+- Quedar preparado para que, en la siguiente unidad, sus parámetros puedan ser
+  controlados por mensajes o eventos provenientes de Strudel.
+
+#### Evidencias de aplicación
+
+La entrega en la bitácora debe incluir:
+
+- Diagrama simple de la arquitectura `entrada → proceso → salida`.
+- Captura legible de la red de TouchDesigner.
+- Tabla de parámetros con nombre, tipo, rango y efecto visual.
+- Capturas de al menos tres resultados distintos producidos por el mismo
+  sistema.
+- Video corto, sin edición obligatoria, en el que se observe la modificación de
+  los parámetros en tiempo real.
+- Reflexión breve: qué regla produjo el resultado más significativo, qué
+  accidente descartaste y qué ajustarías antes de conectarlo con Strudel.
+
+#### Criterios de evaluación de la aplicación
+
+| Criterio | Qué se observará | Peso |
+|---|---|---:|
+| Intención y mentalidad generativa | Coherencia entre intención, entidades, relaciones, reglas, invariantes y variabilidad. | 25% |
+| Construcción del sistema | Red comprensible, funcional y estable; relaciones causales visibles entre operadores. | 25% |
+| Parametrización | Controles significativos, rangos útiles y respuestas continuas o discretas claramente diferenciadas. | 25% |
+| Variación y curaduría | El sistema produce una familia coherente de resultados y el estudiante argumenta sus decisiones de selección y ajuste. | 15% |
+| Documentación | Las evidencias permiten comprender, reproducir y evaluar el proceso y el resultado. | 10% |
+
+### Actividad 05
+
+#### Evaluación conceptual y presentación de la aplicación
+
+Esta sesión cierra la unidad con sus dos componentes de evaluación.
+
+Primero realizarás la **evaluación conceptual**. Allí deberás demostrar que
+comprendes el diseño generativo como diseño de sistemas y relaciones, y no solo
+como producción de imágenes. La evaluación podrá abordar:
+
+- Diferencias entre una pieza fija y un sistema generativo.
+- El modelo `entrada → proceso → salida`.
+- Las ocho operaciones de la mentalidad generativa.
+- Diferencias entre reglas, parámetros, estados y eventos.
+- Función del modelo de datos de TouchDesigner y de las familias de operadores.
+- Relación entre intención, variabilidad, invariantes y curaduría.
+- Preparación de un sistema visual para recibir control externo.
+
+Después presentarás el **sistema visual generativo parametrizable** desarrollado
+en la actividad 04. Dispondrás de cinco minutos para:
+
+1. Explicar la intención y una regla central del sistema.
+2. Mostrar la arquitectura general de la red.
+3. Demostrar en vivo al menos dos parámetros continuos y un evento.
+4. Comparar tres resultados posibles sin cambiar la estructura interna.
+5. Indicar qué parámetros conectarías con Strudel y qué respuesta esperas de
+   cada uno.
+
+La evaluación de aplicación considerará tanto el funcionamiento presentado en
+vivo como las evidencias de proceso publicadas en la bitácora. Si una falla
+técnica impide ejecutar el sistema durante la sesión, el video y el historial
+del repositorio servirán como evidencia complementaria, pero no reemplazan la
+entrega de un proyecto funcional.
