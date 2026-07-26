@@ -212,6 +212,9 @@ lo que haremos ahora.
 
 ### Actividad 03
 
+Puedes descargar el proyecto de TouchDesigner utilizado en esta actividad:
+[sfi1-2026-20-u2-a3.toe](/interactivos1-2026-20/sfi1-2026-20-u2-a3.toe).
+
 #### Construcción guiada: un sistema visual generativo desde cero
 
 En esta actividad construiremos juntos, desde un proyecto vacío de
@@ -261,6 +264,145 @@ mínimo expondremos los siguientes parámetros:
 | `colorShift` | Continuo | Desplazamiento dentro de la paleta. |
 | `pulse` | Evento | Cambio breve de luminosidad, escala o contraste. |
 | `freeze` | Evento | Regreso al campo inicial y mantenimiento de ese estado mientras está activo. |
+
+#### Las expresiones son las reglas del sistema
+
+Los parámetros no son controles aislados. Cada uno modifica una expresión en
+uno o varios operadores. Esas expresiones son las reglas que convierten la
+intención en comportamiento. Durante la construcción leeremos cada una en voz
+alta, cambiaremos sus valores y comprobaremos si el efecto coincide con lo que
+habíamos previsto.
+
+En los ejemplos aparece `op("/project1/generative_system").par.Reset`. Ese es
+el nombre interno que conserva el componente; en la interfaz el mismo control se
+lee como **Freeze Initial**.
+
+##### 1. Evolución temporal del campo principal
+
+En `noise_field`:
+
+```python
+period = op("/project1/generative_system").par.Scale * 0.7 + 0.45
+tx = absTime.seconds * op("/project1/generative_system").par.Speed * 0.12 * (1 - op("/project1/generative_system").par.Reset)
+tz = absTime.seconds * op("/project1/generative_system").par.Speed * 0.18 * (1 - op("/project1/generative_system").par.Reset)
+```
+
+La primera regla hace que `Scale` controle el tamaño espacial del campo. La
+segunda y la tercera hacen que el campo avance por el espacio de ruido con el
+tiempo. Los factores `0.12` y `0.18` son velocidades espaciales distintas:
+producen un movimiento diagonal y evitan que el campo se desplace de forma
+demasiado uniforme. Cuando se activa `Freeze Initial`, el factor `(1 - Reset)`
+se vuelve cero y el campo se mantiene en sus coordenadas iniciales.
+
+Los valores `0.7` y `0.45` no son verdades universales. Son decisiones de
+diseño: mantienen el periodo positivo y ubican la escala del ruido en un rango
+donde las formas se pueden leer sin volverse ni demasiado grandes ni demasiado
+fragmentadas.
+
+##### 2. Segundo campo y relación de deformación
+
+En `noise_motion`:
+
+```python
+period = op("/project1/generative_system").par.Scale * 0.45 + 0.25
+tx = -op("/project1/generative_system").par.Speed * 0.08 * absTime.seconds * (1 - op("/project1/generative_system").par.Reset)
+ty = op("/project1/generative_system").par.Speed * 0.06 * absTime.seconds * (1 - op("/project1/generative_system").par.Reset)
+```
+
+Este campo no se muestra directamente: funciona como una entidad que afecta a
+la primera. Su periodo más pequeño (`0.45` y `0.25`) crea un detalle espacial
+más fino que el campo principal. Los signos y las velocidades `0.08` y `0.06`
+introducen otra dirección de movimiento; la relación entre ambos campos es lo
+que produce la sensación de continuidad o fragmentación.
+
+En `displace_field`:
+
+```python
+displaceweightx = op("/project1/generative_system").par.Deformation * 0.35 + 0.05
+displaceweighty = op("/project1/generative_system").par.Deformation * 0.35 + 0.05
+```
+
+`Deformation` regula cuánto poder tiene el segundo campo sobre el primero. El
+`0.05` deja una deformación mínima para que la relación no desaparezca por
+completo; `0.35` limita el desplazamiento máximo para que la imagen no se
+rompa. Son constantes de estabilidad y legibilidad, no valores que deban
+memorizarse.
+
+##### 3. Contraste y legibilidad
+
+En `level_field`:
+
+```python
+inlow = 0.18
+inhigh = 0.82
+contrast = 1.15 + op("/project1/generative_system").par.Pulse * 0.45
+```
+
+`0.18` y `0.82` recortan los extremos del campo para hacer visibles las masas y
+los bordes. `1.15` conserva una imagen legible en el estado normal; `0.45`
+produce un aumento perceptible cuando llega el evento `Pulse`.
+
+##### 4. Mapeo de valores a color
+
+La `Ramp TOP` usa una rampa horizontal con estos puntos en
+`ramp_palette_keys`:
+
+| Posición | R | G | B | A |
+|---:|---:|---:|---:|---:|
+| 0.00 | 0.01 | 0.02 | 0.08 | 1.00 |
+| 0.30 | 0.02 | 0.20 | 0.50 | 1.00 |
+| 0.62 | 0.85 | 0.08 | 0.24 | 1.00 |
+| 1.00 | 1.00 | 0.72 | 0.08 | 1.00 |
+
+Estos colores son un invariante: ayudan a que las diferentes ejecuciones sigan
+perteneciendo al mismo sistema. El `Lookup TOP` convierte la luminancia del
+campo en posiciones dentro de esa rampa.
+
+En `ramp_palette` y `hsv_color`:
+
+```python
+phase = op("/project1/generative_system").par.Coloroffset / 360.0
+hueoffset = op("/project1/generative_system").par.Coloroffset
+huerange = 360
+saturationmult = 1.25
+```
+
+`Color Shift` se expresa en grados porque un ciclo de color completo tiene 360
+grados. La división entre `360.0` convierte esos grados al rango `0..1` que
+espera la fase de la rampa. El mismo valor se aplica al desplazamiento HSV para
+que la paleta y el ajuste de color respondan de forma coherente. `1.25` aumenta
+moderadamente la saturación sin convertir todos los valores en colores planos.
+
+##### 5. Evento `Pulse`
+
+```python
+valuemult = 1.0 + op("/project1/generative_system").par.Pulse * 0.2
+contrast = 1.0 + op("/project1/generative_system").par.Pulse * 0.35
+```
+
+El evento no cambia la identidad espacial del campo: aumenta temporalmente su
+presencia mediante valor y contraste. Los valores `0.2` y `0.35` son pequeños a
+propósito; el evento debe leerse como una pulsación, no como un cambio completo
+de sistema.
+
+##### 6. Semillas y reproducibilidad
+
+`noise_field` usa `seed = 7` y `noise_motion` usa `seed = 23`. No son números
+mágicos: son dos semillas distintas que permiten que los campos tengan
+identidades independientes y que el resultado pueda reproducirse. Si las
+cambias, cambia la familia de resultados; la regla de relación permanece.
+
+##### Cómo justificar una constante
+
+Para cada constante responderemos tres preguntas:
+
+1. ¿Qué rango de comportamiento permite?
+2. ¿Qué aspecto de la intención protege?
+3. ¿Qué ocurre si la duplicamos, la llevamos a cero o cambiamos su signo?
+
+Una constante queda justificada cuando podemos describir su efecto observable,
+explicar por qué ayuda a conservar la identidad del sistema y mostrar una
+prueba que descarte alternativas menos legibles.
 
 <Aside type="tip" title="Preparación para la Unidad 3">
 En esta actividad los parámetros se controlarán manualmente. Los nombres, rangos
