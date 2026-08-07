@@ -1,13 +1,15 @@
 ---
-title: Unidad 3 - Integración audio-visual con Node.js
+title: Unidad 3 - Integración audio-visual
 unitId: unit3
 ---
 
 import { Aside } from '@astrojs/starlight/components';
+import {LinkPreview} from 'astro-embed';
+
 
 ## Título
 
-Integración audio-visual con Node.js: sincronización entre Strudel y p5.js.
+Integración audio-visual: sincronización entre Strudel y TouchDesigner.
 
 ## Momento del curso
 
@@ -15,10 +17,8 @@ Investigación.
 
 ## Propósito
 
-Integrar Strudel y p5.js mediante Node.js como puente de comunicación. La unidad
-aborda la sincronización audio-visual como un problema de eventos, mensajes,
-tiempo y arquitectura: Strudel produce eventos temporales, Node.js los recibe y
-los distribuye, y p5.js los transforma en respuestas visuales.
+El propósito de esta unidad es comprender cómo abordar el problema de la 
+integración de Strudel y TouchDesigner. 
 
 ## Tiempo
 
@@ -28,17 +28,25 @@ los distribuye, y p5.js los transforma en respuestas visuales.
 
 Esta unidad aporta el **12.5%** de la nota final.
 
-| Componente | Valor | Evidencia |
-|---|---:|---|
-| Conceptual | 6.25% | Examen sobre eventos, mensajes, sincronización, latencia, timestamp, transporte y arquitectura de integración. |
-| Aplicación | 6.25% | Sistema audio-visual sincronizado usando Strudel, Node.js y p5.js, documentado en la bitácora de GitHub. |
-
-<Aside type="caution" title="Bitácora">
-La bitácora debe explicar cómo viajan los eventos desde Strudel hasta la visual,
-qué rol cumple Node.js y cómo se traduce el tiempo musical en comportamiento
-visual.
-</Aside>
-
 ## Actividades
 
-Esta sección se irá completando clase a clase.
+### Actividad 01: el problema de la integración
+En esta actividad se abordará el problema de la integración de Strudel y TouchDesigner.  
+Vamos a analizar juntos este problema y a proponer soluciones.
+
+### Actividad 02: sincronización de eventos
+
+Vamos a utilzar el componente [TDStrudelSync2](https://github.com/juanferfranco/TDSyncStrudel2).
+
+<LinkPreview id="https://github.com/juanferfranco/TDSyncStrudel2" 
+title="TDStrudelSync"
+/>
+
+### Actividad 03: tu proyecto
+
+En esta actividad vas a aplicar lo aprendido en las actividades anteriores para integrar 
+Strudel y TouchDesigner en tus proyectos de la unidad 1 y 2.
+
+### Actividad 04: presentación de proyectos
+
+En esta actividad vas a presentar tu proyecto de integración de Strudel y TouchDesigner.
