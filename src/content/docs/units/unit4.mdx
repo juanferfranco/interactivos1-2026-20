@@ -4,6 +4,8 @@ unitId: unit4
 ---
 
 import { Aside } from '@astrojs/starlight/components';
+import {LinkPreview} from 'astro-embed';
+
 
 ## Título
 
@@ -28,16 +30,28 @@ que puede producir Open Stage Control.
 
 Esta unidad aporta el **12.5%** de la nota final.
 
-| Componente | Valor | Evidencia |
-|---|---:|---|
-| Conceptual | 6.25% | Examen sobre control paramétrico, mensajes OSC, estado persistente, interfaces performáticas y arquitectura de integración. |
-| Aplicación | 6.25% | Superficie de control funcional integrada al sistema audio-visual, documentada en la bitácora de GitHub. |
-
-<Aside type="caution" title="Bitácora">
-La bitácora debe documentar los controles diseñados, los parámetros que modifican,
-la estructura de mensajes y la forma en que esos controles afectan la pieza.
-</Aside>
-
 ## Actividades
 
-Esta sección se irá completando clase a clase.
+### Actividad 01: el problema de la integración
+
+En esta actividad se abordará el problema de la integración de Strudel y Open Stage Control.
+
+### Actividad 02: caso de estudio
+
+En esta actividad vamos a conectar una superficie de control llamada [Open Stage Control](https://openstagecontrol.ammd.net/) 
+a TouchDesigner. La idea es que puedas controlar en tiempo real algunos parámetros de tus visuales generadas en TouchDesigner. 
+
+Para los experimentos de esta unidad vamos a utilizar [este](https://github.com/juanferfranco/TDOpenStage) repositorio como 
+punto de partidida. 
+
+### Actividad 03: tu proyecto
+
+Es momento de aplicar lo aprendido en las actividades anteriores para integrar Open Stage Control y TouchDesigner en tus proyectos de la unidad 1, 2 y 3.
+
+Al terminar esta unidad tendremos: strudel + touchdesigner + open stage control.
+
+### Actividad 04: evaluación
+
+Una vez termines la integración de Open Stage Control y TouchDesigner, vas a mostrarle a tu profesor el resultado de tu proyecto. 
+La idea es poder ofrecerte retroalimentación personalizada y que podamos hacer los ajustes necesarios antes de adicionar la parte final 
+de este proyecto de curso que es la integración de input del performer.
