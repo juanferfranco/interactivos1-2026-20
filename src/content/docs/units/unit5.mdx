@@ -7,7 +7,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## Título
 
-Input del performer: dispositivo externo e interacción física.
+Input del performer: visión computacional e interacción corporal
 
 ## Momento del curso
 
@@ -15,10 +15,23 @@ Investigación.
 
 ## Propósito
 
-Integrar un dispositivo externo como fuente de interacción performática. La
-unidad entiende lo físico como la captura de información del mundo exterior y su
-transformación en comportamiento sonoro, visual o escénico. El dispositivo podrá
-usar serial, MIDI u otra forma de entrada definida durante el curso.
+En las unidades anteriores hemos construido progresivamente un sistema audiovisual 
+en tiempo real. Strudel nos permitió producir eventos temporales, TouchDesigner 
+construir el sistema visual y Open Stage Control modificar parámetros de manera 
+explícita durante la ejecución.
+
+En esta unidad vamos a incorporar una forma diferente de entrada. En lugar de 
+manipular directamente una interfaz, utilizaremos una cámara para observar al 
+performer y extraer información de su cuerpo. Nuestro problema ya no será 
+solamente recibir datos, sino decidir qué información corporal resulta útil, 
+cómo interpretarla y qué función debe cumplir dentro de la pieza.
+
+La tecnología que utilizaremos principalmente será MediaPipe, pero 
+el objetivo de la unidad no es aprender una herramienta específica. Nos interesa 
+comprender un proceso más general:
+
+captura → inferencia → interpretación → comunicación → mapeo → respuesta
+
 
 ## Tiempo
 
@@ -27,16 +40,6 @@ usar serial, MIDI u otra forma de entrada definida durante el curso.
 ## Evaluación
 
 Esta unidad aporta el **12.5%** de la nota final.
-
-| Componente | Valor | Evidencia |
-|---|---:|---|
-| Conceptual | 6.25% | Examen sobre entrada física, captura de datos, mapeo, gesto, performatividad, protocolos posibles y arquitectura de integración. |
-| Aplicación | 6.25% | Dispositivo externo integrado al sistema audio-visual como input del performer, documentado en la bitácora de GitHub. |
-
-<Aside type="caution" title="Bitácora">
-La bitácora debe explicar qué información captura el dispositivo, cómo se mapea
-al sistema y qué papel cumple dentro de la ejecución performática.
-</Aside>
 
 ## Actividades
 
