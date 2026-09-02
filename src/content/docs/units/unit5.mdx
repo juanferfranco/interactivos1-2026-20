@@ -5,10 +5,6 @@ unitId: unit5
 
 import { Aside } from '@astrojs/starlight/components';
 
-## Título
-
-Input del performer: visión computacional e interacción corporal
-
 ## Momento del curso
 
 Investigación.
@@ -43,4 +39,97 @@ Esta unidad aporta el **12.5%** de la nota final.
 
 ## Actividades
 
-### Actividad 01
+### Actividad 01: del cuerpo a los datos
+
+En esta actividad vamos a explorar cómo una cámara puede convertirse en una fuente de entrada para un sistema interactivo.
+
+Utilizaremos modelos de visión computacional capaces de estimar información sobre manos, cuerpo, rostro y otros elementos de la imagen. 
+Nuestro interés no estará en estudiar cómo se entrena internamente cada modelo, sino en comprender qué ocurre durante la inferencia, 
+qué información produce y cómo podemos utilizarla posteriormente.
+
+Observaremos conceptos como landmarks, coordenadas, tracking, confianza y latencia. También analizaremos el componente MediaPipe para 
+TouchDesigner desarrollado por Torin Blankensmith para entender cómo logra integrar un sistema de visión computacional con TouchDesigner.
+
+La idea fundamental será distinguir entre observar, inferir e interpretar. Un modelo puede indicarnos dónde se encuentra una mano o 
+una parte del cuerpo, pero todavía somos nosotros quienes debemos decidir qué significado tendrá esa información dentro de la interacción.
+
+<Aside type="tip" title="Idea clave"> El resultado de un modelo no es todavía una interacción. El modelo produce información; nosotros 
+diseñamos qué significa y qué debe controlar. </Aside>
+
+Los recursos que usaremos serán:
+
+[MediaPipe TouchDesigner de Torin Blankensmith](https://github.com/torinmb/mediapipe-touchdesigner)  
+[Releases de MediaPipe TouchDesigner](https://github.com/torinmb/mediapipe-touchdesigner/releases)  
+[MediaPipe Tasks Vision](https://developers.google.com/edge/mediapipe/solutions/guide)  
+
+### Actividad 02: de los landmarks a la interacción
+
+Ahora vamos a concentrarnos en hand tracking como caso de estudio. Una mano contiene suficientes relaciones entre puntos para explorar 
+posiciones, distancias, velocidades, orientaciones, gestos y eventos sin aumentar innecesariamente la complejidad.
+
+Tomaremos como referencia la Hand Tracking Master Class de Torin Blankensmith. Partiremos de los landmarks producidos por el modelo y veremos 
+cómo seleccionar información relevante, transformar coordenadas, suavizar datos, calcular relaciones entre puntos y convertir esas relaciones 
+en controles, estados o eventos.
+
+Construiremos una interacción sencilla en la que el movimiento de la mano determine una posición y un gesto, como un pinch, permita activar un objetivo.
+
+El proceso que queremos hacer visible es:
+
+landmarks → información derivada → estado o gesto → evento → respuesta
+
+No se trata de utilizar todos los datos disponibles, sino de reconocer cuáles necesitamos y cómo transformarlos 
+en una interacción comprensible y controlable.
+
+Los recursos que usaremos serán:
+
+[Hand Tracking Master Class](https://youtube.com/playlist?list=PLgfxkm9xFocaQXGTxu7HlFomE05kPbO8z&si=U_TBVjyvvcbWn5y-)
+[MediaPipe Hand Landmarker](https://developers.google.com/edge/mediapipe/solutions/vision/hand_landmarker)
+
+### Actividad 03: reto de diseño
+
+Ahora vas a incorporar visión computacional al sistema audiovisual que vienes construyendo durante el curso.
+
+No estás limitado al seguimiento de manos. Puedes utilizar manos, pose, rostro, segmentación u otro modelo disponible, 
+siempre que la elección responda a una intención clara.
+
+No comiences preguntándote qué parámetro puedes conectar. Comienza preguntándote: ¿Qué quiero que pueda hacer el performer con su cuerpo?
+
+A partir de esta decisión determina qué necesita observar el sistema, qué información produce el modelo, qué datos necesitas 
+seleccionar y qué interpretación debes construir.
+
+Tu solución deberá hacer evidente el proceso:
+
+captura → inferencia → selección → interpretación → variable, estado o evento → mapeo → respuesta audiovisual
+
+No basta con conectar directamente una coordenada disponible con un parámetro. Debes poder explicar por qué una determinada acción 
+corporal controla o modifica ese aspecto de tu pieza.
+
+Antes de comenzar te recomiendo que registres en tu bitácora personal:
+
+¿Qué acción realizará el performer?  
+¿Qué información necesitas observar?  
+¿Cómo vas a interpretar esa información?  
+¿Qué elemento del sistema audiovisual controlarás?  
+¿Por qué esa relación tiene sentido dentro de tu propuesta?  
+
+### Actividad 04: integra, prueba y ajusta
+
+En esta actividad vas a completar la integración del nuevo input corporal con el sistema construido durante las unidades anteriores.
+
+Tener funcionando el modelo no significa todavía tener una buena interacción. Ahora debes probar el sistema como performer y 
+observar cómo responde en condiciones reales.
+
+Revisa aspectos como: estabilidad del tracking; sensibilidad de los controles; latencia; activaciones accidentales; pérdida temporal del performer;
+comodidad de los movimientos; convivencia con Strudel y Open Stage Control.
+
+Cuando sea necesario podrás utilizar técnicas como smoothing, umbrales, zonas muertas, hysteresis o estados intermedios.
+
+Estas decisiones no son únicamente correcciones técnicas. También forman parte del diseño de la interacción. Al terminar deberás 
+poder explicar con claridad: qué observa el sistema → qué infiere → cómo interpretas la información → qué controla → cómo 
+responde la pieza → por qué diseñaste esa relación
+
+### Actividad 05: evaluación
+
+Una vez termines las actividades 3 y 4 llama al profesor para mostrarle tu sistemas funcionando y recibir retroalimentación. 
+
+
