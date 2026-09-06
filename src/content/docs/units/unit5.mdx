@@ -68,6 +68,427 @@ Esta imagen detalla la arquitectura del componente de MediaPipe TouchDesigner y 
 
 ![Arquitectura de MediaPipe TouchDesigner](/interactivos1-2026-20/MediaPipeTouchDesignerArch.svg)
 
+<details>
+<summary><strong>🔎 Para los más curiosos: ¿Qué ocurre realmente dentro del componente de MediaPipe?</strong></summary>
+
+Si solo quieres **usar MediaPipe como entrada para tu sistema interactivo**, no necesitas conocer todo lo que sigue.
+
+Pero si te interesa entender **cómo se integra una tecnología externa con TouchDesigner**, este componente es un caso de estudio particularmente interesante.
+
+La primera sorpresa es esta:
+
+> **MediaPipe no se está ejecutando realmente dentro de TouchDesigner.**
+
+El componente construye un pequeño sistema compuesto por varias tecnologías que colaboran entre sí.
+
+De manera simplificada:
+
+```text
+Cámara
+  ↓
+Chromium
+  ↓
+MediaPipe
+  ↓
+landmarks
+  ↓
+JSON
+  ↓
+WebSocket
+  ↓
+TouchDesigner
+  ↓
+CHOP / SOP / DAT
+  ↓
+tu sistema audiovisual
+```
+
+#### TouchDesigner es el integrador, no el runtime de machine learning
+
+Cuando cargas el componente, TouchDesigner levanta un pequeño **servidor web local**.
+
+Ese servidor entrega una aplicación HTML/JavaScript a un navegador Chromium que TouchDesigner puede ejecutar internamente mediante sus componentes web.
+
+La aplicación web utiliza:
+
+```text
+@mediapipe/tasks-vision
+```
+
+y los recursos WebAssembly necesarios para ejecutar MediaPipe.
+
+Por tanto, conceptualmente tienes:
+
+```text
+TouchDesigner
+      │
+      ├── servidor web local
+      │
+      └── Chromium
+              │
+              ├── JavaScript
+              ├── MediaPipe Tasks
+              ├── WebAssembly
+              └── GPU
+```
+
+Esta diferencia es importante.
+
+TouchDesigner **no necesita implementar internamente el detector de manos, pose o rostro**. Simplemente hospeda otro sistema capaz de hacerlo y se comunica con él.
+
+---
+
+#### ¿Cómo obtiene MediaPipe la imagen?
+
+La aplicación que se ejecuta en Chromium utiliza las mismas APIs que podría utilizar una página web:
+
+```javascript
+navigator.mediaDevices.getUserMedia()
+```
+
+Es decir, el navegador solicita acceso a una cámara y obtiene un flujo de video.
+
+Después MediaPipe analiza los frames de ese video.
+
+Por ejemplo, para manos:
+
+```text
+frame de cámara
+      ↓
+detección de la mano
+      ↓
+región de interés
+      ↓
+modelo de landmarks
+      ↓
+21 puntos
+```
+
+Pero MediaPipe tampoco comienza necesariamente desde cero en cada frame.
+
+Una vez localizada una mano puede intentar **seguirla temporalmente**. Mientras el tracking siga siendo confiable, puede evitar repetir parte del proceso de detección.
+
+Por eso parámetros como:
+
+```text
+Detection Confidence
+Presence Confidence
+Tracking Confidence
+```
+
+no significan exactamente lo mismo.
+
+---
+
+#### ¿WebAssembly o GPU?
+
+En realidad intervienen ambos.
+
+La aplicación utiliza el runtime de MediaPipe distribuido mediante **WebAssembly**, pero los Tasks pueden solicitar además un **GPU delegate** para acelerar la inferencia.
+
+Una forma útil de imaginarlo es:
+
+```text
+JavaScript
+      ↓
+MediaPipe Tasks API
+      ↓
+runtime WebAssembly
+      ↓
+GPU delegate
+      ↓
+modelo
+```
+
+No necesitas memorizar esta pila tecnológica.
+
+Lo importante es reconocer una idea:
+
+> **el lugar desde donde controlas un sistema no tiene por qué ser el mismo lugar donde ocurre el procesamiento pesado.**
+
+Esta idea aparecerá muchas veces cuando construyas sistemas interactivos más complejos.
+
+---
+
+#### Entonces, ¿Cómo llegan los landmarks a TouchDesigner?
+
+Supongamos que MediaPipe detectó una mano.
+
+El resultado podría parecer conceptualmente a esto:
+
+```javascript
+{
+  landmarks: [
+    { x: ..., y: ..., z: ... },
+    { x: ..., y: ..., z: ... },
+    ...
+  ]
+}
+```
+
+Todavía es un **objeto JavaScript**.
+
+No es un CHOP.
+
+Para enviarlo a TouchDesigner, la aplicación lo convierte en JSON:
+
+```javascript
+JSON.stringify(result)
+```
+
+y lo transmite mediante un **WebSocket local**.
+
+```text
+MediaPipe
+    ↓
+objeto JavaScript
+    ↓
+JSON
+    ↓
+WebSocket
+    ↓
+TouchDesigner
+```
+
+Dentro de TouchDesigner, el componente recibe ese JSON y los componentes de decodificación lo transforman en estructuras más convenientes:
+
+```text
+JSON
+ ↓
+DAT
+ ↓
+decoder
+ ↓
+CHOP / SOP / DAT
+```
+
+Solo entonces puedes hacer cosas como:
+
+```text
+posición de la mano
+        ↓
+Math CHOP
+        ↓
+parámetro de un sistema visual
+```
+
+---
+
+#### El video y los landmarks siguen caminos diferentes
+
+Este detalle es fácil de pasar por alto.
+
+El componente produce, por un lado, una imagen donde puedes ver:
+
+```text
+video + skeleton + landmarks
+```
+
+pero esa imagen **no es utilizada para obtener posteriormente los datos**.
+
+Existen dos caminos paralelos.
+
+##### Camino visual
+
+```text
+cámara
+ ↓
+Chromium
+ ↓
+video + overlays
+ ↓
+Web Render
+ ↓
+TOP
+```
+
+##### Camino de datos
+
+```text
+cámara
+ ↓
+MediaPipe
+ ↓
+landmarks
+ ↓
+JSON
+ ↓
+WebSocket
+ ↓
+DAT
+ ↓
+CHOP / SOP
+```
+
+El TOP sirve para **ver**.
+
+Los datos que utilizarás para construir interacción llegan por otro canal.
+
+---
+
+#### ¿Qué ocurre si activas varios modelos?
+
+Aquí aparece otra consecuencia interesante de la arquitectura.
+
+Puedes activar:
+
+```text
+Hands
+Pose
+Face
+Gesture
+Object Detection
+...
+```
+
+pero el componente no necesariamente ejecuta todos esos modelos simultáneamente.
+
+Los Tasks activos se procesan de manera esencialmente **secuencial**:
+
+```text
+Hands
+  ↓
+Pose
+  ↓
+Face
+  ↓
+Object Detector
+```
+
+Por tanto, activar más modelos aumenta el trabajo realizado sobre cada frame.
+
+Esto explica una recomendación práctica:
+
+> **Activa únicamente los modelos que realmente necesites.**
+
+En sistemas interactivos en tiempo real, agregar capacidades tiene un costo.
+
+Más análisis puede significar:
+
+```text
+más inferencia
++
+más latencia
++
+menos frecuencia de actualización
+```
+
+Diseñar un sistema también significa decidir **qué no ejecutar**.
+
+---
+
+#### ¿Por qué construir algo así en lugar de usar Python directamente?
+
+Podríamos imaginar otra arquitectura:
+
+```text
+TouchDesigner
+      ↕ OSC
+Python
+      ↓
+MediaPipe
+```
+
+De hecho, podrías construirla tú mismo.
+
+Pero entonces tendrías que gestionar cuestiones como:
+
+```text
+versión de Python
+entorno virtual
+dependencias
+MediaPipe
+compatibilidad
+procesos externos
+comunicación entre aplicaciones
+```
+
+La estrategia utilizada por este componente aprovecha que TouchDesigner ya puede ejecutar Chromium.
+
+Así, gran parte de la solución se apoya en tecnologías web relativamente portables:
+
+```text
+HTML
+JavaScript
+WebAssembly
+WebSocket
+```
+
+Esta es una de las razones por las que el componente puede funcionar tanto en Windows como en macOS sin instalar un entorno Python completo para MediaPipe.
+
+---
+
+#### Lo más importante que puedes aprender de esta arquitectura
+
+Si llegaste hasta aquí, hay una idea más interesante que simplemente aprender a utilizar MediaPipe.
+
+Observa lo siguiente:
+
+```text
+MediaPipe no sabe que TouchDesigner existe.
+
+TouchDesigner no necesita saber
+cómo funciona internamente el modelo.
+
+WebSocket no necesita saber
+qué significa un landmark.
+
+El modelo tampoco necesita saber
+qué visual vas a controlar.
+```
+
+Cada parte tiene una **responsabilidad** y se conecta con las demás mediante una **interfaz**.
+
+Podemos separar el problema en tres preguntas:
+
+| Nivel           | Pregunta                                                 |
+| --------------- | -------------------------------------------------------- |
+| **Modelo**      | ¿Cómo interpreto la imagen?                              |
+| **Runtime**     | ¿Dónde y con qué tecnología ejecuto ese modelo?          |
+| **Integración** | ¿Cómo llevo sus resultados hasta mi sistema interactivo? |
+
+En este caso:
+
+```text
+¿QUÉ interpreta la imagen?
+→ MediaPipe Tasks
+
+¿DÓNDE ocurre?
+→ Chromium + WebAssembly + GPU
+
+¿CÓMO llegan los resultados?
+→ JSON + WebSocket
+
+¿CÓMO se vuelven utilizables?
+→ DAT → decoder → CHOP/SOP/DAT
+```
+
+Esta separación es mucho más general que MediaPipe.
+
+Es exactamente la misma pregunta que puedes hacer cuando conectas:
+
+```text
+Strudel
+Open Stage Control
+un microcontrolador
+un servidor Python
+un modelo de IA
+un teléfono
+otro computador
+un servicio web
+```
+
+con TouchDesigner.
+
+Por eso este componente puede entenderse como algo más que *“MediaPipe para TouchDesigner”*.
+
+Es un pequeño ejemplo de **arquitectura de un sistema interactivo heterogéneo** en el que diferentes tecnologías colaboran sin tener que convertirse en una sola aplicación.
+
+Y esa idea sí vale la pena llevarte de esta unidad.
+
+</details>
+
+
 ### Actividad 02: de los landmarks a la interacción
 
 Ahora vamos a concentrarnos en hand tracking como caso de estudio. Una mano contiene suficientes relaciones entre puntos para explorar 
