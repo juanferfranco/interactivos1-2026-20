@@ -41,9 +41,9 @@ export default defineConfig({
 						{ label: 'U3 - Integración audio-visual', slug: 'units/unit3'},
 						{ label: 'U4 - Superficie de control', slug: 'units/unit4'},
 						{ label: 'U5 - Input del performer', slug: 'units/unit5'},
-						{ label: 'U6 - Creación', slug: 'units/unit6',badge: 'New'},
-						{ label: 'U7 - Performance', slug: 'units/unit7' },
-						{ label: 'U8 - Síntesis', slug: 'units/unit8' },
+						{ label: 'U6 - Creación', slug: 'units/unit6'},
+						{ label: 'U7 - Performance', slug: 'units/unit7',badge: 'New'},
+						{ label: 'U8 - Síntesis', slug: 'units/unit8'},
 					],
 				},
 				{
